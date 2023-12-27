@@ -3,18 +3,16 @@ from django.contrib import admin
 
 
 # Register your models here.
-@admin.register(MenuLink)
-class MenuLinkAdmin(admin.ModelAdmin):
-
-    list_display = ("id", 'text', 'url_or_path')
-    list_display_links = ("id", "text", "url_or_path")
-    list_filter = ('id',)
-    search_fields = ('id', 'text', 'url_or_path')
-    ordering = ('id',)
+class MenuLinkInline(admin.TabularInline):
+    '''Tabular Inline View for MenuLink'''
+    model = MenuLink
+    extra = 1
+    
     
 @admin.register(SiteSetup)
 class SiteSetupAdmin(admin.ModelAdmin):
     list_display = ("title", "description")
+    inlines = (MenuLinkInline),
     
     def has_add_permission(self, request):
         return not SiteSetup.objects.exists()
