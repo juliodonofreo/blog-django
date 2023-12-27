@@ -14,3 +14,24 @@ class MenuLink (models.Model):
     
     def __str__(self):
         return self.text
+    
+    
+class SiteSetup(models.Model):
+    class Meta:
+        verbose_name = "Setup"
+        verbose_name_plural = "Setup"
+
+    title = models.CharField(("title"), max_length=65)
+    description = models.CharField(("description"), max_length=255)
+    
+    show_header = models.BooleanField(("show header?"), default=True)
+    show_search = models.BooleanField(("show search?"), default=True)
+    show_menu = models.BooleanField(("show menu?"), default=True)
+    show_description = models.BooleanField(("show description?"), default=True)
+    show_pagination = models.BooleanField(("show pagination?"), default=True)
+    show_footer = models.BooleanField(("show footer?"), default=True)
+    
+    def __str__(self):
+        return self.title
+    
+
