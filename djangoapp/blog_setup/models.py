@@ -1,4 +1,5 @@
 from django.db import models
+from utils import image, model_validators
 
 
 # Create your models here.
@@ -17,7 +18,23 @@ class SiteSetup(models.Model):
     show_pagination = models.BooleanField(("show pagination?"), default=True)
     show_footer = models.BooleanField(("show footer?"), default=True)
     
-    favicon = models.ImageField(("Icon"), upload_to="assets/favicon", blank=True, default="")
+    favicon = models.ImageField(("Icon"),
+                                upload_to="assets/favicon", 
+                                blank=True, 
+                                default="",
+                                validators=[model_validators.validate_png], 
+                                help_text="A imagem deve ser .png")
+
+    def save(self, *args, **kwargs):
+        current_favicon_name = str(self.favicon.name)
+        super().save(*args, **kwargs)
+        favicon_changed = False
+
+        if self.favicon:
+            favicon_changed = current_favicon_name != self.favicon.name
+
+        if favicon_changed:
+            image.resize_image(self.favicon, 32)
 
     def __str__(self):
         return str(self.title)
