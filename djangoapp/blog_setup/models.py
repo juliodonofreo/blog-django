@@ -17,9 +17,8 @@ class SiteSetup(models.Model):
     show_pagination = models.BooleanField(("show pagination?"), default=True)
     show_footer = models.BooleanField(("show footer?"), default=True)
 
-
     def __str__(self):
-        return self.title
+        return str(self.title)
 
 
 class MenuLink (models.Model):
@@ -31,10 +30,8 @@ class MenuLink (models.Model):
     url_or_path = models.CharField(("Url or path"), max_length=2048)
     new_tab = models.BooleanField(("New tab?"), default=False, name="new_tab")
 
-    __default_setup = SiteSetup.objects.first()
-    site_setup = models.ForeignKey(SiteSetup, on_delete=models.CASCADE, 
-                                   blank=True, null=True, default=__default_setup)
-
+    site_setup = models.ForeignKey(SiteSetup, on_delete=models.CASCADE,
+                                   blank=True, null=True)
 
     def __str__(self):
-        return self.text
+        return str(self.text)
