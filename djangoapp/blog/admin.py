@@ -1,4 +1,4 @@
-from blog.models import Category, Page, Tag
+from blog.models import Category, Page, Post, Tag
 from django.contrib import admin
 
 
@@ -30,15 +30,19 @@ class CategoryAdmin(admin.ModelAdmin):
         "slug": ("name", )
     }
     
-@admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
+@admin.register(Post)
+class Admin(admin.ModelAdmin):
+    '''Admin View for '''
 
-    list_display = ('id', 'title', 'slug')
+    list_display = ('id', "title", "is_published", "created_at")
     list_display_links = ("title",)
-    list_filter = ('id',)
-    search_fields = ('title', 'slug')
-    list_per_page = 10
-    ordering = ('id',)
+    readonly_fields = ('created_at', "updated_at", "updated_by", "created_by",)
+    search_fields = ('id', "title", "slug", "created_at")
+    list_per_page = 50
+    list_filter = ("category", "is_published")
+    list_editable = ("is_published", )
+    ordering = ("-id",)
     prepopulated_fields = {
         "slug": ("title", )
     }
+    autocomplete_fields = ("tag", "category")
