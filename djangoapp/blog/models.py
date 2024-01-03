@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from utils import image
 from utils.rands import random_slugify
 
 
@@ -122,4 +123,12 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = random_slugify(self.title, 5)
-        return super().save(*args, **kwargs)
+        current_cover_name = str(self.cover.name)
+        super().save(*args, **kwargs)
+        cover_changed = False
+
+        if self.cover:
+            cover_changed = current_cover_name != self.cover.name
+
+        if cover_changed:
+            image.resize_image(self.cover, 900, True, 70)
