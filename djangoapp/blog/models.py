@@ -131,7 +131,7 @@ class Post(models.Model):
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True,
                                  default=None)
-    tag = models.ManyToManyField(Tag, blank=True, default='')
+    tag = models.ManyToManyField(Tag, blank=True, default='', related_name="tag_set")
 
     def __str__(self):
         return str(self.title)

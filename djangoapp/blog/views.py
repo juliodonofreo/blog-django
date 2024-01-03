@@ -1,12 +1,14 @@
+from blog.models import Post
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
-posts = list(range(1000))
 POSTS_PER_PAGE = 9
 
 
 # Create your views here.
 def index(request):
+    posts = Post.objects.filter(is_published=True).order_by("created_at")
+    print(posts)
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -24,5 +26,7 @@ def page(request):
     return render(request, "blog/pages/page.html")
 
 
-def post(request):
-    return render(request, "blog/pages/post.html")
+def post(request, slug):
+    post = Post.objects.get(slug=slug)
+    context = {"post": post}
+    return render(request, "blog/pages/post.html", context)
