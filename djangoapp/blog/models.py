@@ -20,7 +20,8 @@ class PostAttachment(AbstractAttachment):
 
         if file_changed:
             image.resize_image(self.file, 900, True, 70)
-    
+
+
 class Tag(models.Model):
     class Meta:
         verbose_name = ("Tag")
@@ -95,6 +96,11 @@ class Page(models.Model):
         return super().save(*args, **kwargs)
 
 
+class PostManager(models.Manager):
+    def get_published(self):
+        return self.filter(is_published=True).order_by("-created_at")
+
+
 class Post(models.Model):
     class Meta:
         verbose_name = ("Post")
@@ -131,7 +137,9 @@ class Post(models.Model):
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True,
                                  default=None)
-    tag = models.ManyToManyField(Tag, blank=True, default='', related_name="tag_set")
+    tag = models.ManyToManyField(Tag, blank=True, default='',
+                                 related_name="tag_set")
+    objects = PostManager()
 
     def __str__(self):
         return str(self.title)

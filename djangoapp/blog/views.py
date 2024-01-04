@@ -7,8 +7,7 @@ POSTS_PER_PAGE = 9
 
 # Create your views here.
 def index(request):
-    posts = Post.objects.filter(is_published=True).order_by("created_at")
-    print(posts)
+    posts = Post.objects.get_published()
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
