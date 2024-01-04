@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 from django_summernote.models import AbstractAttachment
 from utils import image
 from utils.rands import random_slugify
@@ -156,3 +157,9 @@ class Post(models.Model):
 
         if cover_changed:
             image.resize_image(self.cover, 900, True, 70)
+    
+    def get_absolute_url(self):
+        if not self.is_published:
+            return reverse("blog:index")
+        return reverse("blog:post", kwargs={"slug": self.slug})
+    

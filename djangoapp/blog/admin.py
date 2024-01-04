@@ -1,5 +1,7 @@
 from blog.models import Category, Page, Post, Tag
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import mark_safe
 from django_summernote.admin import SummernoteModelAdmin
 
 
@@ -38,12 +40,13 @@ class CategoryAdmin(admin.ModelAdmin):
     }
     
 @admin.register(Post)
-class Admin(SummernoteModelAdmin):
-    '''Admin View for '''
+class PostAdmin(SummernoteModelAdmin):
+    '''Admin View for Post'''
 
     list_display = ('id', "title", "is_published", "created_at")
     list_display_links = ("title",)
-    readonly_fields = ('created_at', "updated_at", "updated_by", "created_by",)
+    readonly_fields = ('created_at', "updated_at", "updated_by", "created_by", 
+                       )
     search_fields = ('id', "title", "slug", "created_at")
     list_per_page = 50
     list_filter = ("category", "is_published")
