@@ -159,7 +159,5 @@ class Post(models.Model):
             image.resize_image(self.cover, 900, True, 70)
     
     def get_absolute_url(self):
-        if not self.is_published:
-            return reverse("blog:index")
         return reverse("blog:post", kwargs={"slug": self.slug})
     
