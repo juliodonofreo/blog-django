@@ -1,6 +1,7 @@
 from blog.models import Post
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, render
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 
 POSTS_PER_PAGE = 9
 
@@ -26,8 +27,8 @@ def page(request):
 
 
 def post(request, slug):
-    post_object = Post.objects.get(slug=slug)
+    post_object = get_object_or_404(Post, slug=slug)
     if post_object.is_published or request.user.is_staff:
         context = {"post": post_object}
         return render(request, "blog/pages/post.html", context)
-    return redirect("blog:index")
+    raise Http404
