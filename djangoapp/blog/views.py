@@ -1,7 +1,7 @@
 from blog.models import Post
 from django.core.paginator import Paginator
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 
 POSTS_PER_PAGE = 9
 
@@ -22,7 +22,39 @@ def index(request):
     )
 
 
-def page(request):
+def created_by(request, author_id):
+    posts = Post.objects.get_published() \
+        .filter(created_by__pk=author_id)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'blog/pages/index.html',
+        {
+            'page_obj': page_obj,
+        }
+    )
+
+
+def category(request, slug):
+    posts = Post.objects.get_published() \
+        .filter(category__slug=slug)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'blog/pages/index.html',
+        {
+            'page_obj': page_obj,
+        }
+    )
+
+
+def page(request, slug):
     return render(request, "blog/pages/page.html")
 
 

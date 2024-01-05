@@ -4,9 +4,14 @@
 <main class="main-content single-post section-wrapper">
   <div class="single-post-content section-content-narrow">
     <div class="single-post-gap section-gap">
-      <div class="single-post-cover pb-base">
-        <img loading="lazy" src="{{ post.cover.url }}" alt="Change me">
-      </div>
+      
+      {% if post.cover_in_post_content and post.cover %}
+        <div class="single-post-cover pb-base">
+          <img loading="lazy" src="{{ post.cover.url }}" alt="Change me">
+        </div>
+      {% endif %}
+        
+     
 
       <h2 class="single-post-title pb-base center">
         {{ post.title }}
@@ -14,7 +19,7 @@
 
       <div class="post-meta pb-base">
         <div class="post-meta-item">
-          <a class="post-meta-link" href="#">
+          <a class="post-meta-link" href="{% url 'blog:author' post.created_by.id %}">
             <i class="fa-solid fa-user"></i>
             <span>
               {{ post.created_by }}
@@ -22,21 +27,23 @@
           </a>
         </div>
         <div class="post-meta-item">
-          <a class="post-meta-link" href="#">
+          <span class="post-meta-link">
             <i class="fa-solid fa-calendar-days"></i>
             <span>
               {{ post.created_at }}
             </span>
-          </a>
+          </span>
         </div>
-        <div class="post-meta-item">
-          <a class="post-meta-link" href="#">
-            <i class="fa-solid fa-tag"></i>
-            <span>
-              {{ post.category.name }}
-            </span>
-          </a>
-        </div>
+        {% if post.category %}
+          <div class="post-meta-item">
+            <a class="post-meta-link" href="{% url 'blog:category' post.category.slug %}">
+              <i class="fa-solid fa-tag"></i>
+              <span>
+                {{ post.category.name }}
+              </span>
+            </a>
+          </div>
+        {% endif %}
       </div>
 
       
