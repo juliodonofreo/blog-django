@@ -64,3 +64,19 @@ def post(request, slug):
         context = {"post": post_object}
         return render(request, "blog/pages/post.html", context)
     raise Http404
+
+
+def tag(request, slug):
+    posts = Post.objects.get_published() \
+        .filter(tag__slug=slug)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'blog/pages/index.html',
+        {
+            'page_obj': page_obj,
+        }
+    )

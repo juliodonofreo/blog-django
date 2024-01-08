@@ -58,8 +58,6 @@
         {% endif %}
       </div>
 
-      
-
       <p class="single-post-excerpt pb-base">
         {{ post.excerpt | safe }}
       </p>
@@ -68,25 +66,24 @@
 
       <div class="single-post-content">
         {{post.content | safe}}
-
-        <div class="post-tags">
-          <span>Tags: </span>
-
-          
-          {% for tag in post.tag.all  %}
-            <a class="post-tag-link" href="#">
-              <i class="fa-solid fa-link"></i>
-              <span>{{ tag.name }}</span>
-            </a>
-          {% endfor %}
-            
-
-        </div>
         
+        
+        
+          <div class="post-tags">
+            {% if post.tag.all.exists %}
+            <span>Tags: </span>
+
+            
+            {% for tag in post.tag.all  %}
+              <a class="post-tag-link" href="{% url 'blog:tag' tag.slug %}">
+                <i class="fa-solid fa-link"></i>
+                <span>{{ tag.name }}</span>
+              </a>
+            {% endfor %}
+            {% endif %}
+        </div>
       </div>
-    
     </div>
   </div>
 </main>
-
 {% endblock content %}
