@@ -19,7 +19,7 @@
         
   
         <div class="search pb-base center">
-          <form class="search-form" action="#" method="get">
+          <form class="search-form" action="{% url 'blog:search' %}" method="get">
             {% if setup.show_search %}
               <div class="search-content">
                 <label class="sr-only" id="search-label" for="search-input">Search</label>
@@ -28,8 +28,8 @@
                   type="search"
                   name="search"
                   id="search-input"
-                  placeholder="Search"
-                  value="Non risu potius quam oratione eiciendum? Quo pleb "
+                  placeholder="Pesquisar"
+                  value="{{ request.GET.search }}"
                 >
                 <button class="search-btn" type="submit" aria-labelledby="search-label">
                   <i class="fa fa-search"></i>
