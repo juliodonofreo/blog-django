@@ -1,7 +1,5 @@
 from blog.models import Category, Page, Post, Tag
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import mark_safe
 from django_summernote.admin import SummernoteModelAdmin
 
 
@@ -24,6 +22,9 @@ class PageAdmin(SummernoteModelAdmin):
     list_display = 'id', 'title', 'is_published',
     list_display_links = 'title',
     search_fields = 'id', 'slug', 'title', 'content',
+    prepopulated_fields = {
+        "slug": ("title", )
+    }
 
 
 @admin.register(Category)

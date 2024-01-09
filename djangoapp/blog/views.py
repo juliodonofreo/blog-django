@@ -1,4 +1,4 @@
-from blog.models import Post
+from blog.models import Page, Post
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404
@@ -56,7 +56,11 @@ def category(request, slug):
 
 
 def page(request, slug):
-    return render(request, "blog/pages/page.html")
+    page_object = get_object_or_404(Page, slug=slug)
+    if page_object.is_published or request.user.is_staff:
+        context = {"page": page_object}
+        return render(request, "blog/pages/page.html", context)
+    raise Http404
 
 
 def post(request, slug):
@@ -85,11 +89,11 @@ def tag(request, slug):
 
 def search(request):
     search_value = request.GET.get("search", "").strip()
-    
+
     posts = Post.objects.get_published() \
         .filter(
             Q(title__icontains=search_value) |
-            Q(excerpt__icontains=search_value)|
+            Q(excerpt__icontains=search_value) |
             Q(content__icontains=search_value)
         )
     paginator = Paginator(posts, POSTS_PER_PAGE)

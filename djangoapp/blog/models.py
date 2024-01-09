@@ -96,6 +96,9 @@ class Page(models.Model):
             self.slug = random_slugify(self.title, 5)
         return super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("blog:page", kwargs={"slug": self.slug})
+
 
 class PostManager(models.Manager):
     def get_published(self):
@@ -157,7 +160,6 @@ class Post(models.Model):
 
         if cover_changed:
             image.resize_image(self.cover, 900, True, 70)
-    
+
     def get_absolute_url(self):
         return reverse("blog:post", kwargs={"slug": self.slug})
-    
