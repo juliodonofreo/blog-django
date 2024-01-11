@@ -4,25 +4,24 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
+from django.views.generic import ListView
 
 POSTS_PER_PAGE = 9
 
 
 # Create your views here.
-def index(request):
-    posts = Post.objects.get_published()
-    paginator = Paginator(posts, POSTS_PER_PAGE)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+class PostListView(ListView):
+    model = Post
+    template_name = "blog/pages/index.html"
+    context_object_name = "posts"
+    ordering = ("-created_at")
+    queryset = Post.objects.get_published()
+    paginate_by = POSTS_PER_PAGE
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': 'Home - '
-        }
-    )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Home - "
+        return context
 
 
 def created_by(request, author_id):
@@ -68,20 +67,20 @@ def category(request, slug):
 
 
 def page(request, slug):
-    page_object = get_object_or_404(Page, slug=slug)
-    if page_object.is_published or request.user.is_staff:
-        page_title = page_object.title
-        context = {"page": page_object, 'page_title': f'{page_title} - '}
+    page_obj = get_object_or_404(Page, slug=slug)
+    if page_obj.is_published or request.user.is_staff:
+        page_title = page_obj.title
+        context = {"page": page_obj, 'page_title': f'{page_title} - '}
         return render(request, "blog/pages/page.html", context)
     raise Http404
 
 
 def post(request, slug):
-    post_object = get_object_or_404(Post, slug=slug)
+    post_obj = get_object_or_404(Post, slug=slug)
 
-    if post_object.is_published or request.user.is_staff:
-        page_title = post_object.title
-        context = {"post": post_object, 'page_title': f'{page_title} - '}
+    if post_obj.is_published or request.user.is_staff:
+        page_title = post_obj.title
+        context = {"post": post_obj, 'page_title': f'{page_title} - '}
         return render(request, "blog/pages/post.html", context)
     raise Http404
 
