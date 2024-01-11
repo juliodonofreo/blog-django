@@ -24,27 +24,67 @@ class PostListView(ListView):
         return context
 
 
-def created_by(request, author_id):
-    user = User.objects.filter(pk=author_id).first()
+# def created_by(request, author_id):
+#     user = User.objects.filter(pk=author_id).first()
 
-    if user is None:
-        raise Http404
+#     if user is None:
+#         raise Http404
 
-    user_name = user.username
-    posts = Post.objects.get_published() \
-        .filter(created_by__pk=author_id)
-    paginator = Paginator(posts, POSTS_PER_PAGE)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+#     user_name = user.username
+#     posts = Post.objects.get_published() \
+#         .filter(created_by__pk=author_id)
+#     paginator = Paginator(posts, POSTS_PER_PAGE)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': f'posts de {user_name} - '
-        }
-    )
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': page_obj,
+#             'page_title': f'posts de {user_name} - '
+#         }
+#     )
+
+class CreatedByListView(PostListView): 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._temp_context = {}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        author_id = self.kwargs.get("author_id")
+        print(f"\n{author_id}")
+        user = self._temp_context["user"]
+
+        user_name = user.username
+        context.update({
+            "page_title": f'posts de {user_name} - '
+        })
+
+        return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        author_id = self._temp_context["author_id"]
+        qs = qs.filter(created_by__pk=author_id)
+        return qs
+
+    def get(self, request, *args, **kwargs):
+        author_id = self.kwargs.get("author_id")
+        user = User.objects.filter(pk=author_id).first()
+
+        if user is None:
+            raise Http404()
+
+        self._temp_context.update(
+            {
+                "author_id": author_id,
+                "user": user
+                }
+        )
+
+        return super().get(request, *args, **kwargs)
 
 
 def category(request, slug):
