@@ -27,17 +27,17 @@ def index(request):
 
 def created_by(request, author_id):
     user = User.objects.filter(pk=author_id).first()
-    
+
     if user is None:
         raise Http404
-    
+
     user_name = user.username
     posts = Post.objects.get_published() \
         .filter(created_by__pk=author_id)
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     return render(
         request,
         'blog/pages/index.html',
@@ -53,7 +53,6 @@ def category(request, slug):
         .filter(category__slug=slug)
     category_name = get_object_or_404(Category, slug=slug).name
 
-        
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -79,7 +78,7 @@ def page(request, slug):
 
 def post(request, slug):
     post_object = get_object_or_404(Post, slug=slug)
-    
+
     if post_object.is_published or request.user.is_staff:
         page_title = post_object.title
         context = {"post": post_object, 'page_title': f'{page_title} - '}
@@ -92,7 +91,6 @@ def tag(request, slug):
         .filter(tag__slug=slug)
     tag_name = get_object_or_404(Tag, slug=slug).name
 
-        
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
