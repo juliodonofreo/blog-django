@@ -24,29 +24,7 @@ class PostListView(ListView):
         return context
 
 
-# def created_by(request, author_id):
-#     user = User.objects.filter(pk=author_id).first()
-
-#     if user is None:
-#         raise Http404
-
-#     user_name = user.username
-#     posts = Post.objects.get_published() \
-#         .filter(created_by__pk=author_id)
-#     paginator = Paginator(posts, POSTS_PER_PAGE)
-#     page_number = request.GET.get("page")
-#     page_obj = paginator.get_page(page_number)
-
-#     return render(
-#         request,
-#         'blog/pages/index.html',
-#         {
-#             'page_obj': page_obj,
-#             'page_title': f'posts de {user_name} - '
-#         }
-#     )
-
-class CreatedByListView(PostListView): 
+class CreatedByListView(PostListView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._temp_context = {}
@@ -87,23 +65,28 @@ class CreatedByListView(PostListView):
         return super().get(request, *args, **kwargs)
 
 
-def category(request, slug):
-    posts = Post.objects.get_published() \
-        .filter(category__slug=slug)
-    category_name = get_object_or_404(Category, slug=slug).name
+class CategoryListView(PostListView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_name = self.kwargs.get("category").name
+        context.update(
+            {"page_title": f"{category_name} - "}
+        )
+        return context
 
-    paginator = Paginator(posts, POSTS_PER_PAGE)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    def get(self, request, *args, **kwargs):
+        category_object = Category.objects\
+            .filter(slug=self.kwargs.get("slug")).first()
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': f'{category_name} -'
-        }
-    )
+        if not category_object:
+            raise Http404
+
+        self.kwargs.update({"category": category_object})
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset()\
+            .filter(category__slug=self.kwargs.get("slug"))
 
 
 def page(request, slug):
