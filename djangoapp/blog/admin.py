@@ -15,7 +15,8 @@ class TagAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         "slug": ("name", )
     }
-    
+
+
 @admin.register(Page)
 class PageAdmin(SummernoteModelAdmin):
     summernote_fields = ('content',)
@@ -39,15 +40,15 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         "slug": ("name", )
     }
-    
+
+
 @admin.register(Post)
 class PostAdmin(SummernoteModelAdmin):
     '''Admin View for Post'''
 
     list_display = ('id', "title", "is_published", "created_at")
     list_display_links = ("title",)
-    readonly_fields = ('created_at', "updated_at", "updated_by", "created_by", 
-                       )
+    readonly_fields = ('created_at', "updated_at", "updated_by", "created_by",)
     search_fields = ('id', "title", "slug", "created_at")
     list_per_page = 50
     list_filter = ("category", "is_published")
@@ -59,7 +60,7 @@ class PostAdmin(SummernoteModelAdmin):
     autocomplete_fields = ("tag", "category")
     summernote_fields = ("content",)
 
-    def save_model(self, request, obj, form, change) -> None:
+    def save_model(self, request, obj: Post, form, change) -> None:
         if change:
             obj.updated_by = request.user
             obj.save()

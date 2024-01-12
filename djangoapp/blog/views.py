@@ -66,6 +66,8 @@ class CreatedByListView(PostListView):
 
 
 class CategoryListView(PostListView):
+    allow_empty = False
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         category_name = self.kwargs.get("category").name
@@ -78,15 +80,35 @@ class CategoryListView(PostListView):
         category_object = Category.objects\
             .filter(slug=self.kwargs.get("slug")).first()
 
-        if not category_object:
-            raise Http404
-
         self.kwargs.update({"category": category_object})
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         return super().get_queryset()\
             .filter(category__slug=self.kwargs.get("slug"))
+
+
+class TagListView(PostListView):
+    allow_empty = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag_name = self.kwargs.get("tag").name
+        context.update(
+            {"page_title": f"{tag_name} - "}
+        )
+        return context
+
+    def get(self, request, *args, **kwargs):
+        tag_object = Tag.objects\
+            .filter(slug=self.kwargs.get("slug")).first()
+
+        self.kwargs.update({"tag": tag_object})
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset()\
+            .filter(tag__slug=self.kwargs.get("slug"))
 
 
 def page(request, slug):
@@ -106,25 +128,6 @@ def post(request, slug):
         context = {"post": post_obj, 'page_title': f'{page_title} - '}
         return render(request, "blog/pages/post.html", context)
     raise Http404
-
-
-def tag(request, slug):
-    posts = Post.objects.get_published() \
-        .filter(tag__slug=slug)
-    tag_name = get_object_or_404(Tag, slug=slug).name
-
-    paginator = Paginator(posts, POSTS_PER_PAGE)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': f'{tag_name} - '
-        }
-    )
 
 
 def search(request):

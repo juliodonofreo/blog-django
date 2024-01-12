@@ -27,7 +27,6 @@ urlpatterns = [
         name="author"),
     path('category/<slug:slug>/', views.CategoryListView.as_view(),
          name="category"),
-    path('tag/<slug:slug>/', views.tag, name="tag"),
+    path('tag/<slug:slug>/', views.TagListView.as_view(), name="tag"),
     path('search/', views.search, name="search"),
-    
 ]
