@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView
 
 POSTS_PER_PAGE = 9
@@ -111,6 +111,37 @@ class TagListView(PostListView):
             .filter(tag__slug=self.kwargs.get("slug"))
 
 
+class SearchListView(PostListView):
+    def setup(self, request, *args, **kwargs) -> None:
+        self._search_value = request.GET["search"].strip()
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_value = self._search_value
+        context.update(
+            {
+                "page_title": f"{search_value} - ",
+                "search_value": search_value
+                }
+        )
+        return context
+
+    def get_queryset(self):
+        search_value = self._search_value
+        return super().get_queryset().filter(
+            Q(title__icontains=search_value) |
+            Q(excerpt__icontains=search_value) |
+            Q(content__icontains=search_value)
+        )
+
+    def get(self, request, *args, **kwargs):
+        if self._search_value == "":
+            return redirect("blog:index")
+
+        return super().get(request, *args, **kwargs)
+
+
 def page(request, slug):
     page_obj = get_object_or_404(Page, slug=slug)
     if page_obj.is_published or request.user.is_staff:
@@ -128,27 +159,3 @@ def post(request, slug):
         context = {"post": post_obj, 'page_title': f'{page_title} - '}
         return render(request, "blog/pages/post.html", context)
     raise Http404
-
-
-def search(request):
-    search_value = request.GET.get("search", "").strip()
-
-    posts = Post.objects.get_published() \
-        .filter(
-            Q(title__icontains=search_value) |
-            Q(excerpt__icontains=search_value) |
-            Q(content__icontains=search_value)
-        )
-    paginator = Paginator(posts, POSTS_PER_PAGE)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': f'{search_value} - Search - ',
-            "search_value": search_value
-        }
-    )
