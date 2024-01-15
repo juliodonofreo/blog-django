@@ -1,10 +1,13 @@
+import http
+from http.client import NOT_FOUND
+from xml.dom import NOT_FOUND_ERR
+
 from blog.models import Category, Page, Post, Tag
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 
 POSTS_PER_PAGE = 9
 
@@ -139,6 +142,37 @@ class SearchListView(PostListView):
         if self._search_value == "":
             return redirect("blog:index")
 
+        return super().get(request, *args, **kwargs)
+    
+
+class PageDetailView(DetailView):
+    model = Page
+    template_name = "blog/pages/page.html"
+    slug_field = "slug"
+    context_object_name = "page"
+    NOT_FOUND_ERR_MSG = "Não possivel encontrar a página, \
+tente novamente mais tarde"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_title = context["page"].title
+        context.update({
+            "page_title": f"{page_title} - "
+        })
+        return context
+
+    def get_object(self, queryset=None):
+        try:
+            obj = super().get_object(queryset)
+        except Http404:
+            raise Http404(self.NOT_FOUND_ERR_MSG)
+        return obj
+
+    def get(self, request, *args, **kwargs):
+        page_obj = self.get_object()
+        print(page_obj)
+        if not (page_obj.is_published or request.user.is_staff):
+            raise Http404(self.NOT_FOUND_ERR_MSG)
         return super().get(request, *args, **kwargs)
 
 

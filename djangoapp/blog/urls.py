@@ -20,7 +20,7 @@ from django.urls import path
 app_name = "blog"
 urlpatterns = [
     path('', views.PostListView.as_view(), name="index"),
-    path('page/<slug:slug>/', views.page, name="page"),
+    path('page/<slug:slug>/', views.PageDetailView.as_view(), name="page"),
     path('post/<slug:slug>/', views.post, name="post"),
     path(
         'created_by/<int:author_id>/', views.CreatedByListView.as_view(),
