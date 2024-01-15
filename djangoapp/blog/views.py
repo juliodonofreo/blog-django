@@ -2,7 +2,7 @@ from blog.models import Category, Page, Post, Tag
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView
 
 POSTS_PER_PAGE = 9
