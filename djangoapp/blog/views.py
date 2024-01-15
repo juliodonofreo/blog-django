@@ -1,7 +1,3 @@
-import http
-from http.client import NOT_FOUND
-from xml.dom import NOT_FOUND_ERR
-
 from blog.models import Category, Page, Post, Tag
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -143,7 +139,7 @@ class SearchListView(PostListView):
             return redirect("blog:index")
 
         return super().get(request, *args, **kwargs)
-    
+
 
 class PageDetailView(DetailView):
     model = Page
@@ -165,31 +161,42 @@ tente novamente mais tarde"
         try:
             obj = super().get_object(queryset)
         except Http404:
+            # Sobrescrevendo mensagem de erro pela customizada da classe.
             raise Http404(self.NOT_FOUND_ERR_MSG)
         return obj
 
     def get(self, request, *args, **kwargs):
         page_obj = self.get_object()
-        print(page_obj)
         if not (page_obj.is_published or request.user.is_staff):
             raise Http404(self.NOT_FOUND_ERR_MSG)
         return super().get(request, *args, **kwargs)
 
 
-def page(request, slug):
-    page_obj = get_object_or_404(Page, slug=slug)
-    if page_obj.is_published or request.user.is_staff:
-        page_title = page_obj.title
-        context = {"page": page_obj, 'page_title': f'{page_title} - '}
-        return render(request, "blog/pages/page.html", context)
-    raise Http404
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "blog/pages/post.html"
+    context_object_name = "post"
+    NOT_FOUND_ERR_MSG = "Não possivel encontrar o post, \
+tente novamente mais tarde"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_title = context["post"].title
+        context.update({
+            "page_title": f"{page_title} - "
+        })
+        return context
 
-def post(request, slug):
-    post_obj = get_object_or_404(Post, slug=slug)
+    def get_object(self, queryset=None):
+        try:
+            obj = super().get_object(queryset)
+        except Http404:
+            # Sobrescrevendo mensagem de erro pela customizada da classe.
+            raise Http404(self.NOT_FOUND_ERR_MSG)
+        return obj
 
-    if post_obj.is_published or request.user.is_staff:
-        page_title = post_obj.title
-        context = {"post": post_obj, 'page_title': f'{page_title} - '}
-        return render(request, "blog/pages/post.html", context)
-    raise Http404
+    def get(self, request, *args, **kwargs):
+        page_obj = self.get_object()
+        if not (page_obj.is_published or request.user.is_staff):
+            raise Http404(self.NOT_FOUND_ERR_MSG)
+        return super().get(request, *args, **kwargs)
