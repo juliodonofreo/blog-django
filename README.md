@@ -21,7 +21,7 @@ Crie, edite e publique posts facilmente. Utilize um editor de texto rico para fo
 O acesso ao blog pode ser feito clicando <a href="http://juliaodasrima.pythonanywhere.com">aqui</a>
 
 <h3>Área admnistrativa</h3>
-Para propósitos de teste, a áre administrativa pode ser acessada neste <a href="http://juliaodasrima.pythonanywhere.com">link</a>
+Para propósitos de teste, a áre administrativa pode ser acessada neste <a href="http://juliaodasrima.pythonanywhere.com/admin">link</a>
 
 foi criado um usuário de teste com permissões limitadas para este fim
 
